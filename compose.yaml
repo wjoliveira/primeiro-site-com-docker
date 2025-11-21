@@ -18,8 +18,8 @@ services:
   wordpress:
     image: wordpress:latest
     restart: always
-    ports:
-      - "80:80" # Porta Externa:Porta Interna
+    #ports:
+    #  - "80:80" # Porta Externa:Porta Interna
     environment:
       # Aqui acontece a mágica da conexão:
       WORDPRESS_DB_HOST: db # O nome do serviço acima!
