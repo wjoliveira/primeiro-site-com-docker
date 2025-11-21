@@ -1,0 +1,16 @@
+name: meu-projeto-web
+
+services:
+  site:
+    # Indica onde está o Dockerfile (o ponto significa "nesta pasta")
+    build: . 
+    
+    # O nome que o container terá (substitui o --name)
+    container_name: site-vps
+    
+    # Comportamento de reinicialização (substitui o --restart always)
+    restart: always
+    
+    # Mapeamento de portas "Externa:Interna" (substitui o -p)
+    ports:
+      - "80:80"
