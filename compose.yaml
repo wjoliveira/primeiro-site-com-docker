@@ -18,8 +18,8 @@ services:
   wordpress:
     image: wordpress:latest
     restart: always
-    ports:
-      - "80:80" # Porta Externa:Porta Interna
+    # ports:
+    #   - "80:80" # Porta Externa:Porta Interna
     environment:
       # Aqui acontece a mágica da conexão:
       WORDPRESS_DB_HOST: db # O nome do serviço acima!
@@ -28,6 +28,9 @@ services:
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
     volumes:
       - wp_data:/var/www/html # Salva os uploads e plugins instalados
+    networks:
+      - default
+      - rede-global
     depends_on:
       - db # Garante que o WP só tenta iniciar depois do DB existir
 
@@ -35,3 +38,8 @@ services:
 volumes:
   db_data:
   wp_data:
+
+# Definição de Rede Global
+networks:
+  rede-global:
+    external: true
