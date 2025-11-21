@@ -1,16 +1,37 @@
-name: meu-projeto-web
+name: meu-blog-wordpress
 
 services:
-  site:
-    # Indica onde está o Dockerfile (o ponto significa "nesta pasta")
-    build: . 
-    
-    # O nome que o container terá (substitui o --name)
-    container_name: site-vps
-    
-    # Comportamento de reinicialização (substitui o --restart always)
+  # SERVIÇO 1: O Banco de Dados
+  db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
-    
-    # Mapeamento de portas "Externa:Interna" (substitui o -p)
+    environment:
+      MYSQL_ROOT_PASSWORD: senha_super_secreta_root
+      MYSQL_DATABASE: wordpress_db
+      MYSQL_USER: usuario_wp
+      MYSQL_PASSWORD: senha_secreta_wp
+    volumes:
+      - db_data:/var/lib/mysql # Mapeia o volume para a pasta de dados do MySQL
+
+  # SERVIÇO 2: O WordPress
+  wordpress:
+    image: wordpress:latest
+    restart: always
     ports:
-      - "80:80"
+      - "80:80" # Porta Externa:Porta Interna
+    environment:
+      # Aqui acontece a mágica da conexão:
+      WORDPRESS_DB_HOST: db # O nome do serviço acima!
+      WORDPRESS_DB_USER: usuario_wp
+      WORDPRESS_DB_PASSWORD: senha_secreta_wp
+      WORDPRESS_DB_NAME: wordpress_db
+    volumes:
+      - wp_data:/var/www/html # Salva os uploads e plugins instalados
+    depends_on:
+      - db # Garante que o WP só tenta iniciar depois do DB existir
+
+# Definição dos Volumes (os "HDs externos")
+volumes:
+  db_data:
+  wp_data:
