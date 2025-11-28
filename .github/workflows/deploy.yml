@@ -1,0 +1,39 @@
+name: Deploy Automático na VPS
+
+# Quando rodar? Sempre que houver push na branch main
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Passo 1: O GitHub faz checkout do código (apenas para verificação)
+    - uses: actions/checkout@v4
+
+    # Passo 2: Conecta via SSH e executa os comandos
+    - name: Executar Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 22
+        # O Script que roda lá dentro da VPS:
+        script: |
+          # 1. Entra na pasta do projeto (Ajuste o caminho se necessário!)
+          cd /home/docker/primeiro-site-com-docker
+          
+          # 2. Garante que pegamos a versão mais nova do código
+          # O checkout força a descartar alterações locais para evitar conflito
+          git checkout .
+          git pull origin main
+          
+          # 3. Atualiza os containers
+          # O docker compose é inteligente: se nada mudou, ele não faz nada.
+          docker compose up -d --build
+          
+          # 4. Limpeza (Opcional)
+          docker image prune -f
